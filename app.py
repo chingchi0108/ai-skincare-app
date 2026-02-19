@@ -13,37 +13,56 @@ URL_TYPE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoS
 URL_STRATEGY = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=569984786&single=true&output=csv"
 
 # ==========================================
-# 💎 高级视觉风格优化 + 微信防白字补丁 (CSS)
+# 💎 终极视觉优化 + 微信防黑补丁 (CSS)
 # ==========================================
 st.set_page_config(page_title="AI 全数据护肤系统", layout="wide")
 
 st.markdown("""
     <style>
-    /* 强制全局背景为浅色 */
-    .stApp { background-color: #F8FAFC !important; }
+    /* 强制全局与侧边栏背景为浅色，彻底击败微信深色模式 */
+    .stApp, [data-testid="stSidebar"], [data-testid="stSidebar"] > div:first-child { 
+        background-color: #F8FAFC !important; 
+    }
     
-    /* 🚨 微信深色模式补丁：强制所有常规文字为深灰色，防止白底白字 */
+    /* 强制所有常规文字为深灰色，防止看不见 */
     .stApp p, .stApp span, .stApp li, .stApp label, .streamlit-expanderHeader {
         color: #1E293B !important;
     }
     
-    /* 保护特殊区块（按钮、提示框）的文字颜色不被强制覆盖 */
+    /* 保护特殊区块文字颜色 */
     div.stButton > button * { color: white !important; }
     div[data-testid="stInfo"] p, div[data-testid="stWarning"] p { color: inherit !important; }
     .stCaption, .stCaption p { color: #64748B !important; }
 
     /* 统一标题样式 */
     .custom-title {
-        font-size: clamp(1.1rem, 4vw, 1.3rem);
-        font-weight: 700;
+        font-size: clamp(1.2rem, 4.5vw, 1.5rem);
+        font-weight: 800;
         color: #0F172A !important;
-        margin-top: 20px;
-        margin-bottom: 12px;
+        margin-top: 10px;
+        margin-bottom: 15px;
     }
     h1, h2, h3, h4, h5, h6 {
         font-size: clamp(1.1rem, 4vw, 1.3rem) !important;
         color: #0F172A !important;
         font-weight: 700 !important;
+    }
+    
+    /* 显眼的左上角提示横幅 (Banner) */
+    .hint-banner {
+        background-color: #EFF6FF;
+        border-left: 4px solid #3B82F6;
+        padding: 12px 16px;
+        border-radius: 0 8px 8px 0;
+        margin-bottom: 25px;
+        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
+        display: flex;
+        align-items: center;
+    }
+    .hint-banner span {
+        color: #1D4ED8 !important;
+        font-weight: 600;
+        font-size: 0.95rem;
     }
     
     /* 卡片式容器设计 */
@@ -55,18 +74,26 @@ st.markdown("""
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
     }
     
+    /* 侧边栏内的折叠面板强制白底黑字 */
+    [data-testid="stSidebar"] [data-testid="stExpander"] {
+        background-color: #FFFFFF !important;
+        border-radius: 8px !important;
+        border: 1px solid #E2E8F0 !important;
+    }
+    
     /* 按钮样式优化 */
     div.stButton > button {
         background: linear-gradient(90deg, #3B82F6 0%, #2563EB 100%);
         color: white;
         border-radius: 8px;
         font-weight: 600;
+        padding: 12px 0;
     }
     
-    /* 成分卡片在手机端自动换行对齐 */
+    /* 成分卡片 */
     .ing-card {
         background: #F1F5F9;
-        padding: 10px;
+        padding: 12px;
         border-radius: 8px;
         text-align: center;
         margin-bottom: 10px;
@@ -75,8 +102,8 @@ st.markdown("""
         flex-direction: column;
         justify-content: center;
     }
-    .ing-card b { color: #0F172A !important; font-size: 0.9rem; }
-    .ing-card span { color: #64748B !important; font-size: 0.8rem; }
+    .ing-card b { color: #0F172A !important; font-size: 0.95rem; }
+    .ing-card span { color: #64748B !important; font-size: 0.8rem; margin-top: 4px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -116,7 +143,15 @@ def load_all_data():
     return df_hero, df_type, df_strategy
 
 def main():
-    st.markdown('<div class="custom-title">🧪 AI 专业护肤成分推荐系统 <span style="font-size:0.8rem; font-weight:400; color:#64748B;">(左上选择肤质)</span></div>', unsafe_allow_html=True)
+    # 顶部标题去掉了丑陋的括号
+    st.markdown('<div class="custom-title">🧪 AI 专业护肤成分推荐系统</div>', unsafe_allow_html=True)
+    
+    # 全新的左上角高颜值提示 Banner
+    st.markdown("""
+        <div class="hint-banner">
+            <span>👈 请先点击左上角【 > 】展开菜单，进行肤质鉴定</span>
+        </div>
+    """, unsafe_allow_html=True)
     
     df_hero, df_profile, df_strategy = load_all_data()
     if df_profile.empty:
@@ -132,13 +167,15 @@ def main():
     if 'current_skin' not in st.session_state: st.session_state.current_skin = None
 
     with st.sidebar:
-        st.markdown('<div class="custom-title">👤 肤质鉴定</div>', unsafe_allow_html=True)
+        st.markdown('<div class="custom-title" style="margin-top:0;">👤 肤质鉴定</div>', unsafe_allow_html=True)
         all_options = df_profile.iloc[:, 0].unique().tolist()
         selected_skin = st.selectbox("🎯 选定您的肌肤类型", all_options, label_visibility="collapsed")
+        
         if selected_skin != st.session_state.current_skin:
             st.session_state.current_skin, st.session_state.step = selected_skin, 1
+            
         st.markdown("---")
-        st.markdown('<div class="custom-title" style="font-size:1rem;">📖 肤质对比指南</div>', unsafe_allow_html=True)
+        st.markdown('<div class="custom-title" style="font-size:1.1rem;">📖 肤质对比指南</div>', unsafe_allow_html=True)
         for _, row in df_profile.iterrows():
             name = row.iloc[0]
             with st.expander(f"{row.get('Icon', '✨')} {name}", expanded=(name == selected_skin)):
@@ -150,6 +187,7 @@ def main():
         user_profile = profile_row.iloc[0]
         st.markdown(f'### {user_profile.get("Icon", "✨")} 已确认为：{selected_skin}')
         st.caption(f"定义参考：{user_profile.get(col_title, '')}")
+        
         c1, c2 = st.columns(2)
         with c1:
             with st.container(border=True):
@@ -165,6 +203,7 @@ def main():
         if st.button("✨ 没问题，这就是我！生成方案", use_container_width=True):
             st.session_state.step = 2
             st.rerun()
+            
     if st.session_state.step == 1: return
 
     st.markdown("---")
@@ -192,7 +231,6 @@ def main():
                     with st.expander("💡 想知道更多.....", expanded=False):
                         st.markdown(str(strat_info.iloc[0, 1]).replace('\n', '  \n'))
 
-                # --- 保证成分显示 ---
                 st.markdown("**✨ 推荐成分**")
                 mask = df_hero[col_cat].str.contains(strategy, na=False)
                 df_hero[col_score] = pd.to_numeric(df_hero[col_score], errors='coerce').fillna(0)
@@ -213,7 +251,6 @@ def main():
                                 st.caption(row[col_inci])
                                 st.write(row[col_desc])
 
-                # 影音指导
                 if not strat_info.empty:
                     video_data = []
                     for i in [5, 6, 7]:
@@ -230,9 +267,9 @@ def main():
                             if 'bilibili.com' in item["url"] or 'b23.tv' in item["url"]:
                                 bv = re.search(r'(BV[a-zA-Z0-9]+)', item["url"])
                                 bvid = bv.group(1) if bv else ""
-                                h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 12px; font-weight: 600; margin-bottom: 5px; color:#475569;">{ttl}</div><iframe src="https://player.bilibili.com/player.html?bvid={bvid}&page=1&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width: 100%; height: 150px; border-radius: 8px;"></iframe></div>"""
+                                h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 13px; font-weight: 600; margin-bottom: 5px; color:#1E293B;">{ttl}</div><iframe src="https://player.bilibili.com/player.html?bvid={bvid}&page=1&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width: 100%; height: 150px; border-radius: 8px;"></iframe></div>"""
                             else:
-                                h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 12px; font-weight: 600; margin-bottom: 5px; color:#475569;">{ttl}</div><video controls style="width: 100%; height: 150px; border-radius: 8px; background: #000;"><source src="{item["url"]}" type="video/mp4"></video></div>"""
+                                h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 13px; font-weight: 600; margin-bottom: 5px; color:#1E293B;">{ttl}</div><video controls style="width: 100%; height: 150px; border-radius: 8px; background: #000;"><source src="{item["url"]}" type="video/mp4"></video></div>"""
                         st.markdown(re.sub(r'\s+', ' ', h + "</div>"), unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
 
