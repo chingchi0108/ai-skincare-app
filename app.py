@@ -66,8 +66,8 @@ def load_all_data():
     return df_hero, df_type, df_strategy
 
 def main():
-    # 回归第一版的纯净标题
-    st.markdown("### 🧪 AI 专业护肤成分推荐系统")
+    # 💡 使用独立 CSS 样式单独放大了这个主标题
+    st.markdown('<div style="font-size: clamp(1.5rem, 6vw, 2.2rem); font-weight: bold; margin-bottom: 0.8rem;">🧪 AI 全数据护肤系统</div>', unsafe_allow_html=True)
     
     # 使用原生的 st.info 来展示提示，干净且兼容所有主题
     st.info("👈 请先点击左上角【 > 】展开菜单，进行肤质鉴定")
