@@ -13,25 +13,40 @@ URL_TYPE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoS
 URL_STRATEGY = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=569984786&single=true&output=csv"
 
 # ==========================================
-# 💎 高级视觉风格优化 (CSS)
+# 💎 高级视觉风格优化 + 微信防白字补丁 (CSS)
 # ==========================================
 st.set_page_config(page_title="AI 全数据护肤系统", layout="wide")
 
 st.markdown("""
     <style>
-    .stApp { background-color: #F8FAFC; }
+    /* 强制全局背景为浅色 */
+    .stApp { background-color: #F8FAFC !important; }
+    
+    /* 🚨 微信深色模式补丁：强制所有常规文字为深灰色，防止白底白字 */
+    .stApp p, .stApp span, .stApp li, .stApp label, .streamlit-expanderHeader {
+        color: #1E293B !important;
+    }
+    
+    /* 保护特殊区块（按钮、提示框）的文字颜色不被强制覆盖 */
+    div.stButton > button * { color: white !important; }
+    div[data-testid="stInfo"] p, div[data-testid="stWarning"] p { color: inherit !important; }
+    .stCaption, .stCaption p { color: #64748B !important; }
+
+    /* 统一标题样式 */
     .custom-title {
         font-size: clamp(1.1rem, 4vw, 1.3rem);
         font-weight: 700;
-        color: #1E293B;
+        color: #0F172A !important;
         margin-top: 20px;
         margin-bottom: 12px;
     }
-    h1, h2, h3, h4 {
+    h1, h2, h3, h4, h5, h6 {
         font-size: clamp(1.1rem, 4vw, 1.3rem) !important;
-        color: #334155 !important;
+        color: #0F172A !important;
         font-weight: 700 !important;
     }
+    
+    /* 卡片式容器设计 */
     [data-testid="stVerticalBlock"] > div > div > div[style*="border"] {
         background-color: white !important;
         border: 1px solid #E2E8F0 !important;
@@ -39,12 +54,15 @@ st.markdown("""
         padding: 20px !important;
         box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
     }
+    
+    /* 按钮样式优化 */
     div.stButton > button {
         background: linear-gradient(90deg, #3B82F6 0%, #2563EB 100%);
         color: white;
         border-radius: 8px;
         font-weight: 600;
     }
+    
     /* 成分卡片在手机端自动换行对齐 */
     .ing-card {
         background: #F1F5F9;
@@ -57,6 +75,8 @@ st.markdown("""
         flex-direction: column;
         justify-content: center;
     }
+    .ing-card b { color: #0F172A !important; font-size: 0.9rem; }
+    .ing-card span { color: #64748B !important; font-size: 0.8rem; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -172,23 +192,21 @@ def main():
                     with st.expander("💡 想知道更多.....", expanded=False):
                         st.markdown(str(strat_info.iloc[0, 1]).replace('\n', '  \n'))
 
-                # --- 核心修改：确保每个策略显示 5 个成分 ---
+                # --- 保证成分显示 ---
                 st.markdown("**✨ 推荐成分**")
                 mask = df_hero[col_cat].str.contains(strategy, na=False)
                 df_hero[col_score] = pd.to_numeric(df_hero[col_score], errors='coerce').fillna(0)
-                # 调整为 head(5) 以获取 5 个成分
                 top_ings = df_hero[mask].sort_values(by=col_score, ascending=False).head(5)
 
                 if not top_ings.empty:
-                    # 自动根据成分数量创建列，每行最多 5 列
                     n_ings = len(top_ings)
                     ing_cols = st.columns(n_ings)
                     for i, (_, row) in enumerate(top_ings.iterrows()):
                         with ing_cols[i]:
                             st.markdown(f"""
                                 <div class="ing-card">
-                                    <b style="font-size:0.9rem;">{row[col_name]}</b>
-                                    <span style="font-size:0.8rem; color:#64748B;">{'★'*int(row[col_score])}</span>
+                                    <b>{row[col_name]}</b>
+                                    <span>{'★'*int(row[col_score])}</span>
                                 </div>
                             """, unsafe_allow_html=True)
                             with st.expander("解析"):
@@ -214,7 +232,7 @@ def main():
                                 bvid = bv.group(1) if bv else ""
                                 h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 12px; font-weight: 600; margin-bottom: 5px; color:#475569;">{ttl}</div><iframe src="https://player.bilibili.com/player.html?bvid={bvid}&page=1&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width: 100%; height: 150px; border-radius: 8px;"></iframe></div>"""
                             else:
-                                h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 12px; font-weight: 600; margin-bottom: 5px;">{ttl}</div><video controls style="width: 100%; height: 150px; border-radius: 8px; background: #000;"><source src="{item["url"]}" type="video/mp4"></video></div>"""
+                                h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 12px; font-weight: 600; margin-bottom: 5px; color:#475569;">{ttl}</div><video controls style="width: 100%; height: 150px; border-radius: 8px; background: #000;"><source src="{item["url"]}" type="video/mp4"></video></div>"""
                         st.markdown(re.sub(r'\s+', ' ', h + "</div>"), unsafe_allow_html=True)
             st.markdown("<br>", unsafe_allow_html=True)
 
