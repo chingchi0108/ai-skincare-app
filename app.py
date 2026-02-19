@@ -13,97 +13,20 @@ URL_TYPE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoS
 URL_STRATEGY = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=569984786&single=true&output=csv"
 
 # ==========================================
-# 💎 终极视觉优化 + 微信防黑补丁 (CSS)
+# 📱 极简 CSS：仅保留字体自适应与滑动容器，去除所有颜色干预
 # ==========================================
 st.set_page_config(page_title="AI 全数据护肤系统", layout="wide")
 
 st.markdown("""
     <style>
-    /* 强制全局与侧边栏背景为浅色，彻底击败微信深色模式 */
-    .stApp, [data-testid="stSidebar"], [data-testid="stSidebar"] > div:first-child { 
-        background-color: #F8FAFC !important; 
-    }
+    /* 仅根据手机屏幕大小微调标题，完全保留 Streamlit 原生颜色体系 */
+    h1 { font-size: clamp(1.2rem, 5vw, 2.2rem) !important; }
+    h2 { font-size: clamp(1.1rem, 4vw, 1.8rem) !important; }
+    h3 { font-size: clamp(1.0rem, 3.5vw, 1.5rem) !important; }
+    h4 { font-size: clamp(0.9rem, 3vw, 1.2rem) !important; }
+    h5 { font-size: clamp(0.85rem, 2.8vw, 1.1rem) !important; }
     
-    /* 强制所有常规文字为深灰色，防止看不见 */
-    .stApp p, .stApp span, .stApp li, .stApp label, .streamlit-expanderHeader {
-        color: #1E293B !important;
-    }
-    
-    /* 保护特殊区块文字颜色 */
-    div.stButton > button * { color: white !important; }
-    div[data-testid="stInfo"] p, div[data-testid="stWarning"] p { color: inherit !important; }
-    .stCaption, .stCaption p { color: #64748B !important; }
-
-    /* 统一标题样式 */
-    .custom-title {
-        font-size: clamp(1.2rem, 4.5vw, 1.5rem);
-        font-weight: 800;
-        color: #0F172A !important;
-        margin-top: 10px;
-        margin-bottom: 15px;
-    }
-    h1, h2, h3, h4, h5, h6 {
-        font-size: clamp(1.1rem, 4vw, 1.3rem) !important;
-        color: #0F172A !important;
-        font-weight: 700 !important;
-    }
-    
-    /* 显眼的左上角提示横幅 (Banner) */
-    .hint-banner {
-        background-color: #EFF6FF;
-        border-left: 4px solid #3B82F6;
-        padding: 12px 16px;
-        border-radius: 0 8px 8px 0;
-        margin-bottom: 25px;
-        box-shadow: 0 2px 4px rgba(59, 130, 246, 0.1);
-        display: flex;
-        align-items: center;
-    }
-    .hint-banner span {
-        color: #1D4ED8 !important;
-        font-weight: 600;
-        font-size: 0.95rem;
-    }
-    
-    /* 卡片式容器设计 */
-    [data-testid="stVerticalBlock"] > div > div > div[style*="border"] {
-        background-color: white !important;
-        border: 1px solid #E2E8F0 !important;
-        border-radius: 12px !important;
-        padding: 20px !important;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05) !important;
-    }
-    
-    /* 侧边栏内的折叠面板强制白底黑字 */
-    [data-testid="stSidebar"] [data-testid="stExpander"] {
-        background-color: #FFFFFF !important;
-        border-radius: 8px !important;
-        border: 1px solid #E2E8F0 !important;
-    }
-    
-    /* 按钮样式优化 */
-    div.stButton > button {
-        background: linear-gradient(90deg, #3B82F6 0%, #2563EB 100%);
-        color: white;
-        border-radius: 8px;
-        font-weight: 600;
-        padding: 12px 0;
-    }
-    
-    /* 成分卡片 */
-    .ing-card {
-        background: #F1F5F9;
-        padding: 12px;
-        border-radius: 8px;
-        text-align: center;
-        margin-bottom: 10px;
-        min-height: 80px;
-        display: flex;
-        flex-direction: column;
-        justify-content: center;
-    }
-    .ing-card b { color: #0F172A !important; font-size: 0.95rem; }
-    .ing-card span { color: #64748B !important; font-size: 0.8rem; margin-top: 4px; }
+    [data-testid="stSidebar"] { width: 300px; }
     </style>
     """, unsafe_allow_html=True)
 
@@ -143,19 +66,15 @@ def load_all_data():
     return df_hero, df_type, df_strategy
 
 def main():
-    # 顶部标题去掉了丑陋的括号
-    st.markdown('<div class="custom-title">🧪 AI 专业护肤成分推荐系统</div>', unsafe_allow_html=True)
+    # 回归第一版的纯净标题
+    st.markdown("### 🧪 AI 专业护肤成分推荐系统")
     
-    # 全新的左上角高颜值提示 Banner
-    st.markdown("""
-        <div class="hint-banner">
-            <span>👈 请先点击左上角【 > 】展开菜单，进行肤质鉴定</span>
-        </div>
-    """, unsafe_allow_html=True)
+    # 使用原生的 st.info 来展示提示，干净且兼容所有主题
+    st.info("👈 请先点击左上角【 > 】展开菜单，进行肤质鉴定")
     
     df_hero, df_profile, df_strategy = load_all_data()
     if df_profile.empty:
-        st.error("正在同步数据，请稍后...")
+        st.error("数据加载中，请稍后...")
         return
 
     col_feel = find_col(df_profile, ['感受', '感', 'Feel'])
@@ -166,51 +85,62 @@ def main():
     if 'step' not in st.session_state: st.session_state.step = 1
     if 'current_skin' not in st.session_state: st.session_state.current_skin = None
 
+    # --- 1. 侧边栏 ---
+    all_options = df_profile.iloc[:, 0].unique().tolist()
     with st.sidebar:
-        st.markdown('<div class="custom-title" style="margin-top:0;">👤 肤质鉴定</div>', unsafe_allow_html=True)
-        all_options = df_profile.iloc[:, 0].unique().tolist()
-        selected_skin = st.selectbox("🎯 选定您的肌肤类型", all_options, label_visibility="collapsed")
-        
+        st.header("👤 肤质鉴定")
+        selected_skin = st.selectbox("选定您的肌肤类型", all_options, label_visibility="collapsed")
+
         if selected_skin != st.session_state.current_skin:
             st.session_state.current_skin, st.session_state.step = selected_skin, 1
-            
+
         st.markdown("---")
-        st.markdown('<div class="custom-title" style="font-size:1.1rem;">📖 肤质对比指南</div>', unsafe_allow_html=True)
+        st.markdown("#### 📖 肤质对比指南")
         for _, row in df_profile.iterrows():
             name = row.iloc[0]
-            with st.expander(f"{row.get('Icon', '✨')} {name}", expanded=(name == selected_skin)):
-                st.markdown(f"**感受**：{str(row.get(col_feel, '暂无'))}")
-                st.markdown(f"**特征**：{str(row.get(col_visual, '暂无'))}")
+            icon = row.get('Icon', '✨')
+            with st.expander(f"{icon} {name}", expanded=(name == selected_skin)):
+                st.markdown("**💬 感受：**")
+                st.caption(str(row.get(col_feel, '暂无')).replace(',', '、\n'))
+                st.markdown("**👁️ 特征：**")
+                st.caption(str(row.get(col_visual, '暂无')).replace(',', '、\n'))
 
+    # --- 2. 核心鉴定结果 ---
     profile_row = df_profile[df_profile.iloc[:, 0] == selected_skin]
     if not profile_row.empty:
         user_profile = profile_row.iloc[0]
-        st.markdown(f'### {user_profile.get("Icon", "✨")} 已确认为：{selected_skin}')
-        st.caption(f"定义参考：{user_profile.get(col_title, '')}")
+        icon = user_profile.get('Icon', '✨')
+        title = user_profile.get(col_title, '')
         
-        c1, c2 = st.columns(2)
-        with c1:
+        st.markdown(f"### {icon} 已确认为：{selected_skin}")
+        st.caption(f"定义参考：{title}")
+        
+        col1, col2 = st.columns(2)
+        with col1:
             with st.container(border=True):
-                st.markdown("**💬 核心感受**")
+                st.markdown("#### 💬 核心感受")
                 st.info(str(user_profile.get(col_feel, '暂无资料')).replace(',', '  \n'))
-        with c2:
+        with col2:
             with st.container(border=True):
-                st.markdown("**👁️ 视觉特写**")
+                st.markdown("#### 👁️ 视觉特写")
                 st.warning(str(user_profile.get(col_visual, '暂无资料')).replace(',', '  \n'))
 
+    # --- 确认按钮 ---
     if st.session_state.step == 1:
         st.markdown("<br>", unsafe_allow_html=True)
-        if st.button("✨ 没问题，这就是我！生成方案", use_container_width=True):
+        if st.button("✨ 没问题，这就是我！生成方案", use_container_width=True, type="primary"):
             st.session_state.step = 2
             st.rerun()
-            
+
     if st.session_state.step == 1: return
 
+    # --- 3. 建议方案 ---
     st.markdown("---")
     st.markdown(f"### 🛡️ {selected_skin} 建议方案")
 
     if col_strat and not profile_row.empty:
         current_strategies = [s.strip() for s in str(profile_row.iloc[0][col_strat]).split(',') if s.strip()]
+        
         col_cat = find_col(df_hero, ['分类', '分類', 'Category'])
         col_score = find_col(df_hero, ['分数', '分數', 'Score'])
         col_name = find_col(df_hero, ['中文', 'Name'])
@@ -218,60 +148,59 @@ def main():
         col_desc = find_col(df_hero, ['功效', '描述', 'Desc'])
 
         for strategy in current_strategies:
-            with st.container(border=True):
-                st.markdown(f"#### 🎯 核心策略：{strategy}")
-                strat_info = df_strategy[df_strategy.iloc[:, 0] == strategy]
+            st.markdown(f"#### 🎯 核心策略：{strategy}")
+            strat_info = df_strategy[df_strategy.iloc[:, 0] == strategy]
+            
+            if not strat_info.empty:
+                img_urls = [convert_google_drive_url(strat_info.iloc[0, i]) for i in [2, 3, 4] 
+                            if len(strat_info.columns) > i and pd.notna(strat_info.iloc[0, i]) and str(strat_info.iloc[0, i]).startswith('http')]
+                if img_urls:
+                    cols = st.columns(len(img_urls))
+                    for idx, url in enumerate(img_urls): cols[idx].image(url, use_container_width=True)
                 
-                if not strat_info.empty:
-                    img_urls = [convert_google_drive_url(strat_info.iloc[0, i]) for i in [2, 3, 4] 
-                                if len(strat_info.columns) > i and pd.notna(strat_info.iloc[0, i]) and str(strat_info.iloc[0, i]).startswith('http')]
-                    if img_urls:
-                        cols = st.columns(len(img_urls))
-                        for idx, url in enumerate(img_urls): cols[idx].image(url, use_container_width=True)
-                    with st.expander("💡 想知道更多.....", expanded=False):
-                        st.markdown(str(strat_info.iloc[0, 1]).replace('\n', '  \n'))
+                with st.expander("💡 想知道更多.....", expanded=False):
+                    st.markdown(str(strat_info.iloc[0, 1]).replace('\n', '  \n'))
 
-                st.markdown("**✨ 推荐成分**")
-                mask = df_hero[col_cat].str.contains(strategy, na=False)
-                df_hero[col_score] = pd.to_numeric(df_hero[col_score], errors='coerce').fillna(0)
-                top_ings = df_hero[mask].sort_values(by=col_score, ascending=False).head(5)
+            # --- 成分展示回归第一版的 2 列布局，并确保提取 5 个 ---
+            st.markdown("##### ✨ 推荐成分")
+            mask = df_hero[col_cat].str.contains(strategy, na=False)
+            df_hero[col_score] = pd.to_numeric(df_hero[col_score], errors='coerce').fillna(0)
+            top_ings = df_hero[mask].sort_values(by=col_score, ascending=False).head(5)
 
-                if not top_ings.empty:
-                    n_ings = len(top_ings)
-                    ing_cols = st.columns(n_ings)
-                    for i, (_, row) in enumerate(top_ings.iterrows()):
-                        with ing_cols[i]:
-                            st.markdown(f"""
-                                <div class="ing-card">
-                                    <b>{row[col_name]}</b>
-                                    <span>{'★'*int(row[col_score])}</span>
-                                </div>
-                            """, unsafe_allow_html=True)
-                            with st.expander("解析"):
-                                st.caption(row[col_inci])
-                                st.write(row[col_desc])
+            if not top_ings.empty:
+                ing_cols = st.columns(2)
+                for i, (_, row) in enumerate(top_ings.iterrows()):
+                    with ing_cols[i % 2]:
+                        with st.expander(f"🏆 {row[col_name]}"):
+                            st.caption(f"INCI: {row[col_inci]}")
+                            score = int(row[col_score])
+                            st.write(f"推荐指数: {'★' * score}")
+                            st.progress(score * 20)
+                            st.markdown(f"**功效：**\n{row[col_desc]}")
 
-                if not strat_info.empty:
-                    video_data = []
-                    for i in [5, 6, 7]:
-                        if len(strat_info.columns) > i:
-                            val = str(strat_info.iloc[0, i]).replace('｜', '|').strip()
-                            if val.startswith('http') or '|' in val:
-                                t, u = val.split('|', 1) if '|' in val else (None, val)
-                                if u.strip().startswith('http'): video_data.append({"title": t, "url": u.strip()})
-                    if video_data:
-                        st.markdown("**🎬 视频指导**")
-                        h = """<div style="display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; width: 100%;">"""
-                        for idx, item in enumerate(video_data):
-                            ttl = item["title"] if item["title"] else f"视频 {idx+1}"
-                            if 'bilibili.com' in item["url"] or 'b23.tv' in item["url"]:
-                                bv = re.search(r'(BV[a-zA-Z0-9]+)', item["url"])
-                                bvid = bv.group(1) if bv else ""
-                                h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 13px; font-weight: 600; margin-bottom: 5px; color:#1E293B;">{ttl}</div><iframe src="https://player.bilibili.com/player.html?bvid={bvid}&page=1&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width: 100%; height: 150px; border-radius: 8px;"></iframe></div>"""
-                            else:
-                                h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 13px; font-weight: 600; margin-bottom: 5px; color:#1E293B;">{ttl}</div><video controls style="width: 100%; height: 150px; border-radius: 8px; background: #000;"><source src="{item["url"]}" type="video/mp4"></video></div>"""
-                        st.markdown(re.sub(r'\s+', ' ', h + "</div>"), unsafe_allow_html=True)
-            st.markdown("<br>", unsafe_allow_html=True)
+            # 影音指导保留原生格式，去除颜色干预
+            if not strat_info.empty:
+                video_data = []
+                for i in [5, 6, 7]:
+                    if len(strat_info.columns) > i:
+                        val = str(strat_info.iloc[0, i]).replace('｜', '|').strip()
+                        if val.startswith('http') or '|' in val:
+                            t, u = val.split('|', 1) if '|' in val else (None, val)
+                            if u.strip().startswith('http'): video_data.append({"title": t, "url": u.strip()})
+                
+                if video_data:
+                    st.markdown("##### 🎬 视频指导")
+                    h = """<div style="display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; width: 100%;">"""
+                    for idx, item in enumerate(video_data):
+                        ttl = item["title"] if item["title"] else f"视频 {idx+1}"
+                        if 'bilibili.com' in item["url"] or 'b23.tv' in item["url"]:
+                            bv = re.search(r'(BV[a-zA-Z0-9]+)', item["url"])
+                            bvid = bv.group(1) if bv else ""
+                            h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 13px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{ttl}</div><iframe src="https://player.bilibili.com/player.html?bvid={bvid}&page=1&high_quality=1&danmaku=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width: 100%; height: 160px; border-radius: 8px;"></iframe><a href="{item["url"]}" target="_blank" style="font-size: 12px; text-decoration: none;">🔗 B站观看</a></div>"""
+                        else:
+                            h += f"""<div style="flex: 0 0 260px;"><div style="font-size: 13px; font-weight: bold; margin-bottom: 5px;">{ttl}</div><video controls style="width: 100%; height: 160px; border-radius: 8px; background: #000;"><source src="{item["url"]}" type="video/mp4"></video></div>"""
+                    st.markdown(re.sub(r'\s+', ' ', h + "</div>"), unsafe_allow_html=True)
+            st.markdown("---")
 
 if __name__ == "__main__":
     main()
