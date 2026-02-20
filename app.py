@@ -13,7 +13,7 @@ URL_TYPE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoS
 URL_STRATEGY = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=569984786&single=true&output=csv"
 
 # 👇 【新增】請在這裡貼上你剛剛發布的 AI_Weekly_Picks 分頁的 CSV 連結
-URL_AI_PICKS = "請在這裡貼上你的_AI_Weekly_Picks_CSV_連結" 
+URL_AI_PICKS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=1100021982&single=true&output=csv" 
 
 # ==========================================
 # 📱 2. 极简 CSS
