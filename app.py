@@ -6,14 +6,17 @@ import requests
 import re
 
 # ==========================================
-# 🔗 CSV 发布链接
+# 🔗 1. CSV 发布链接 (请在此处贴上您的链接)
 # ==========================================
 URL_HERO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=1879612607&single=true&output=csv"
 URL_TYPE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=384260746&single=true&output=csv"
 URL_STRATEGY = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=569984786&single=true&output=csv"
 
+# 👇 【新增】請在這裡貼上你剛剛發布的 AI_Weekly_Picks 分頁的 CSV 連結
+URL_AI_PICKS = "請在這裡貼上你的_AI_Weekly_Picks_CSV_連結" 
+
 # ==========================================
-# 📱 极简 CSS
+# 📱 2. 极简 CSS
 # ==========================================
 st.set_page_config(page_title="AI 全数据护肤系统", layout="wide")
 
@@ -55,20 +58,11 @@ st.markdown("""
         margin-top: 15px;
         margin-bottom: 10px;
     }
-    
-    .sunscreen-type {
-        font-size: 0.95rem;
-        font-weight: 700;
-        /* 【优化】使用系统自适应文字颜色，防止微信深色模式下隐形 */
-        color: var(--text-color); 
-        margin-top: 10px;
-        display: block;
-    }
     </style>
     """, unsafe_allow_html=True)
 
 # ==========================================
-# 🛠️ 核心逻辑
+# 🛠️ 3. 核心逻辑
 # ==========================================
 def find_col(df, keywords):
     for col in df.columns:
@@ -85,6 +79,9 @@ def convert_google_drive_url(url):
     return url
 
 def safe_read_csv(url):
+    """安全地讀取 CSV 檔案"""
+    if "請在這裡貼上" in url: # 防呆機制，若未填寫網址則回傳空表
+        return pd.DataFrame()
     try:
         safe_url = quote(url, safe=':/?&=')
         response = requests.get(safe_url)
@@ -102,11 +99,21 @@ def load_all_data():
                 df[col] = df[col].astype(str).str.strip().replace('nan', pd.NA).str.replace('，', ',').str.replace('、', ',')
     return df_hero, df_type, df_strategy
 
+@st.cache_data(ttl=60)
+def load_ai_picks():
+    """從 Google Sheet 讀取本週 AI 嚴選清單"""
+    df = safe_read_csv(URL_AI_PICKS)
+    if not df.empty:
+        df.columns = df.columns.str.strip()
+    return df
+
 def main():
     st.markdown('<div style="font-size: clamp(1.5rem, 6vw, 2.2rem); font-weight: bold; margin-bottom: 0.8rem;">🧪 AI 全数据护肤系统</div>', unsafe_allow_html=True)
     st.info("👈 请先点击左上角【 > 】展开菜单，进行肤质鉴定")
     
     df_hero, df_profile, df_strategy = load_all_data()
+    df_ai_picks = load_ai_picks() # 載入 AI 預先算好的清單
+    
     if df_profile.empty:
         st.error("数据加载中，请稍后...")
         return
@@ -212,81 +219,55 @@ def main():
                             st.markdown(f"**功效：**\n{row[col_desc]}")
                 
                 # ==========================================
-                # 🛍️ 综合商品推荐与搜索大区块 (条件分流)
+                # 🛍️ 读取并渲染 AI 严选单品与搜寻按钮
                 # ==========================================
                 st.markdown("<br>", unsafe_allow_html=True)
                 
-                # 【新增】微信防拦截温馨提示
                 st.markdown("""
                     <div style='background-color: #333333; padding: 10px; border-radius: 8px; margin-bottom: 15px;'>
                         <span style='color: #FFD700; font-size: 13px;'>💡 <b>温馨提示：</b> 若在微信内点击下方按钮无反应，请点击右上角「...」选择<b>「在浏览器打开」</b>，即可顺畅唤醒 App 查看。</span>
                     </div>
                 """, unsafe_allow_html=True)
-                
-                # 判断当前策略是否包含"防晒"
-                if "防晒" in strategy or "防曬" in strategy:
-                    st.markdown(f"""
-                    <div class="recommend-box">
-                        <h5 style="margin-top:0; color:#0F172A;">🛍️ 专属防晒选购指南 (口碑 Top 3-5)</h5>
-                        <p style="font-size:0.9rem; color:#475569; margin-bottom:10px;">
-                            针对您的肤质与【{strategy}】诉求，我们为您提供了三大防晒方向。<br>
-                            👉 <b>点击下方标签，直接检索全网最热卖的防晒单品：</b>
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    # 1. 物理性防晒 (【修正】移除了小红书与天猫的 target="_blank")
-                    phys_kw = quote(f"{strategy} 物理防晒")
-                    st.markdown(f"""
-                        <span class="sunscreen-type">🛡️ 物理性防晒 (温和不刺激，适合敏弱肌)</span>
-                        <a href="xhsdiscover://search/result?keyword={phys_kw}" class="shop-link xhs-link">📕 小红书口碑</a>
-                        <a href="https://so.m.jd.com/ware/search.action?keyword={phys_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
-                        <a href="taobao://s.taobao.com/search?q={phys_kw}" class="shop-link tb-link">🟠 天猫爆款</a>
-                    """, unsafe_allow_html=True)
-                    
-                    # 2. 化学性防晒 (【修正】移除了小红书与天猫的 target="_blank")
-                    chem_kw = quote(f"{strategy} 化学防晒")
-                    st.markdown(f"""
-                        <span class="sunscreen-type">🧪 化学性防晒 (清爽不泛白，适合油皮)</span>
-                        <a href="xhsdiscover://search/result?keyword={chem_kw}" class="shop-link xhs-link">📕 小红书口碑</a>
-                        <a href="https://so.m.jd.com/ware/search.action?keyword={chem_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
-                        <a href="taobao://s.taobao.com/search?q={chem_kw}" class="shop-link tb-link">🟠 天猫爆款</a>
-                    """, unsafe_allow_html=True)
-                    
-                    # 3. 综合性防晒 (【修正】移除了小红书与天猫的 target="_blank")
-                    hyb_kw = quote(f"{strategy} 物化结合防晒")
-                    st.markdown(f"""
-                        <span class="sunscreen-type">✨ 综合性防晒 (物化结合，兼顾肤感与温和)</span>
-                        <a href="xhsdiscover://search/result?keyword={hyb_kw}" class="shop-link xhs-link">📕 小红书口碑</a>
-                        <a href="https://so.m.jd.com/ware/search.action?keyword={hyb_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
-                        <a href="taobao://s.taobao.com/search?q={hyb_kw}" class="shop-link tb-link">🟠 天猫爆款</a>
-                    """, unsafe_allow_html=True)
-                    
-                else:
-                    # 一般护肤：5 个成分全上
-                    top_ing_names = top_ings[col_name].tolist()
-                    search_ings = " ".join(top_ing_names[:5])
-                    
-                    st.markdown(f"""
-                    <div class="recommend-box">
-                        <h5 style="margin-top:0; color:#0F172A;">🛍️ 综合护肤产品口碑榜 (口碑 Top 3-5)</h5>
-                        <p style="font-size:0.9rem; color:#475569; margin-bottom:10px;">
-                            结合您的【{strategy}】诉求，以及上述 <b>5 大核心推荐成分</b>，我们为您生成了最强检索通道。<br>
-                            👉 <b>点击下方查看网友票选及各大电商比价：</b>
-                        </p>
-                    </div>
-                    """, unsafe_allow_html=True)
-                    
-                    shop_keyword = quote(f"{strategy} {search_ings}")
-                    
-                    # (【修正】移除了小红书与天猫的 target="_blank")
-                    st.markdown(f"""
-                        <a href="xhsdiscover://search/result?keyword={shop_keyword}" class="shop-link xhs-link">📕 搜寻小红书 3-5 强口碑</a>
-                        <a href="https://so.m.jd.com/ware/search.action?keyword={shop_keyword}" target="_blank" class="shop-link jd-link">🔴 去京东查直营价格</a>
-                        <a href="taobao://s.taobao.com/search?q={shop_keyword}" class="shop-link tb-link">🟠 去天猫搜相关爆款</a>
-                    """, unsafe_allow_html=True)
 
-            # 影音指导
+                st.markdown(f"""
+                <div class="recommend-box">
+                    <h5 style="margin-top:0; color:#0F172A;">🤖 本周 AI 严选好物</h5>
+                    <p style="font-size:0.9rem; color:#475569; margin-bottom:10px;">
+                        针对您的【{strategy}】诉求，AI 机器买手已从全网提取最新配方，为您筛选出以下符合核心成分的口碑爆款。<br>
+                        👉 <b>直接点击下方按钮，查看真实测评与全网底价：</b>
+                    </p>
+                </div>
+                """, unsafe_allow_html=True)
+
+                # 从 df_ai_picks 中过滤出属于目前策略的产品
+                if not df_ai_picks.empty and 'Strategy' in df_ai_picks.columns:
+                    ai_products = df_ai_picks[df_ai_picks['Strategy'] == strategy]
+                    
+                    if not ai_products.empty:
+                        for _, row in ai_products.iterrows():
+                            # 讀取對應的欄位，並去除空值
+                            prod_name = str(row.get("Product_Name", "")).strip()
+                            prod_desc = str(row.get("Product_Desc", "")).strip()
+                            
+                            # 確保產品名稱不是空的，也不是 nan
+                            if prod_name and prod_name.lower() != 'nan':
+                                prod_kw = quote(prod_name)
+                                # 注意：這裡依然保留了移除 target="_blank" 的設定 (除了京東)，以利微信跳轉
+                                st.markdown(f"""
+                                    <div style="margin-bottom: 15px; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; background-color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+                                        <div style="font-weight: bold; font-size: 1.05rem; color: #1E293B;">🛍️ {prod_name}</div>
+                                        <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 10px; margin-top: 4px;">{prod_desc}</div>
+                                        <a href="xhsdiscover://search/result?keyword={prod_kw}" class="shop-link xhs-link">📕 搜小红书测评</a>
+                                        <a href="https://so.m.jd.com/ware/search.action?keyword={prod_kw}" target="_blank" class="shop-link jd-link">🔴 京东查底价</a>
+                                        <a href="taobao://s.taobao.com/search?q={prod_kw}" class="shop-link tb-link">🟠 天猫看爆款</a>
+                                    </div>
+                                """, unsafe_allow_html=True)
+                    else:
+                        st.info(f"正在等待 AI 買手為【{strategy}】更新推薦單品...")
+                else:
+                    st.warning("⚠️ 尚未載入本週 AI 嚴選清單，請確認 URL_AI_PICKS 是否填寫正確。")
+
+            # --- 影音指导 ---
             if not strat_info.empty:
                 st.markdown("<br>", unsafe_allow_html=True)
                 video_data = []
