@@ -53,13 +53,14 @@ st.markdown("""
         padding: 15px;
         border-radius: 0 8px 8px 0;
         margin-top: 15px;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
     }
     
     .sunscreen-type {
         font-size: 0.95rem;
         font-weight: 700;
-        color: #1E293B;
+        /* 【优化】使用系统自适应文字颜色，防止微信深色模式下隐形 */
+        color: var(--text-color); 
         margin-top: 10px;
         display: block;
     }
@@ -215,6 +216,13 @@ def main():
                 # ==========================================
                 st.markdown("<br>", unsafe_allow_html=True)
                 
+                # 【新增】微信防拦截温馨提示
+                st.markdown("""
+                    <div style='background-color: #333333; padding: 10px; border-radius: 8px; margin-bottom: 15px;'>
+                        <span style='color: #FFD700; font-size: 13px;'>💡 <b>温馨提示：</b> 若在微信内点击下方按钮无反应，请点击右上角「...」选择<b>「在浏览器打开」</b>，即可顺畅唤醒 App 查看。</span>
+                    </div>
+                """, unsafe_allow_html=True)
+                
                 # 判断当前策略是否包含"防晒"
                 if "防晒" in strategy or "防曬" in strategy:
                     st.markdown(f"""
@@ -227,54 +235,55 @@ def main():
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # 1. 物理性防晒
-                    phys_kw = quote(f"{strategy} 物理防晒 推荐")
+                    # 1. 物理性防晒 (移除“推荐”关键字)
+                    phys_kw = quote(f"{strategy} 物理防晒")
                     st.markdown(f"""
                         <span class="sunscreen-type">🛡️ 物理性防晒 (温和不刺激，适合敏弱肌)</span>
-                        <a href="https://www.xiaohongshu.com/search_result?keyword={phys_kw}&source=web_search_result_notes" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
-                        <a href="https://search.jd.com/Search?keyword={phys_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
-                        <a href="https://s.taobao.com/search?q={phys_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
+                        <a href="xhsdiscover://search/result?keyword={phys_kw}" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
+                        <a href="https://so.m.jd.com/ware/search.action?keyword={phys_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
+                        <a href="taobao://s.taobao.com/search?q={phys_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
                     """, unsafe_allow_html=True)
                     
-                    # 2. 化学性防晒
-                    chem_kw = quote(f"{strategy} 化学防晒 推荐")
+                    # 2. 化学性防晒 (移除“推荐”关键字)
+                    chem_kw = quote(f"{strategy} 化学防晒")
                     st.markdown(f"""
                         <span class="sunscreen-type">🧪 化学性防晒 (清爽不泛白，适合油皮)</span>
-                        <a href="https://www.xiaohongshu.com/search_result?keyword={chem_kw}&source=web_search_result_notes" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
-                        <a href="https://search.jd.com/Search?keyword={chem_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
-                        <a href="https://s.taobao.com/search?q={chem_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
+                        <a href="xhsdiscover://search/result?keyword={chem_kw}" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
+                        <a href="https://so.m.jd.com/ware/search.action?keyword={chem_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
+                        <a href="taobao://s.taobao.com/search?q={chem_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
                     """, unsafe_allow_html=True)
                     
-                    # 3. 综合性防晒 (物化结合)
-                    hyb_kw = quote(f"{strategy} 物化结合防晒 推荐")
+                    # 3. 综合性防晒 (移除“推荐”关键字)
+                    hyb_kw = quote(f"{strategy} 物化结合防晒")
                     st.markdown(f"""
                         <span class="sunscreen-type">✨ 综合性防晒 (物化结合，兼顾肤感与温和)</span>
-                        <a href="https://www.xiaohongshu.com/search_result?keyword={hyb_kw}&source=web_search_result_notes" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
-                        <a href="https://search.jd.com/Search?keyword={hyb_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
-                        <a href="https://s.taobao.com/search?q={hyb_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
+                        <a href="xhsdiscover://search/result?keyword={hyb_kw}" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
+                        <a href="https://so.m.jd.com/ware/search.action?keyword={hyb_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
+                        <a href="taobao://s.taobao.com/search?q={hyb_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
                     """, unsafe_allow_html=True)
                     
                 else:
                     # 一般护肤：5 个成分全上
                     top_ing_names = top_ings[col_name].tolist()
-                    search_ings = " ".join(top_ing_names[:5]) # 组合全部 5 个成分
+                    search_ings = " ".join(top_ing_names[:5])
                     
                     st.markdown(f"""
                     <div class="recommend-box">
                         <h5 style="margin-top:0; color:#0F172A;">🛍️ 综合护肤产品口碑榜 (口碑 Top 3-5)</h5>
                         <p style="font-size:0.9rem; color:#475569; margin-bottom:10px;">
                             结合您的【{strategy}】诉求，以及上述 <b>5 大核心推荐成分</b>，我们为您生成了最强检索通道。<br>
-                            👉 <b>点击下方查看小红书网友票选及各大电商比价：</b>
+                            👉 <b>点击下方查看网友票选及各大电商比价：</b>
                         </p>
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    shop_keyword = quote(f"{strategy} {search_ings} 推荐")
+                    # (移除“推荐”关键字)
+                    shop_keyword = quote(f"{strategy} {search_ings}")
                     
                     st.markdown(f"""
-                        <a href="https://www.xiaohongshu.com/search_result?keyword={shop_keyword}&source=web_search_result_notes" target="_blank" class="shop-link xhs-link">📕 搜寻小红书 3-5 强口碑</a>
-                        <a href="https://search.jd.com/Search?keyword={shop_keyword}" target="_blank" class="shop-link jd-link">🔴 去京东查直营价格</a>
-                        <a href="https://s.taobao.com/search?q={shop_keyword}" target="_blank" class="shop-link tb-link">🟠 去天猫搜相关爆款</a>
+                        <a href="xhsdiscover://search/result?keyword={shop_keyword}" target="_blank" class="shop-link xhs-link">📕 搜寻小红书 3-5 强口碑</a>
+                        <a href="https://so.m.jd.com/ware/search.action?keyword={shop_keyword}" target="_blank" class="shop-link jd-link">🔴 去京东查直营价格</a>
+                        <a href="taobao://s.taobao.com/search?q={shop_keyword}" target="_blank" class="shop-link tb-link">🟠 去天猫搜相关爆款</a>
                     """, unsafe_allow_html=True)
 
             # 影音指导
