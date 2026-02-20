@@ -12,7 +12,7 @@ URL_HERO = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoS
 URL_TYPE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=384260746&single=true&output=csv"
 URL_STRATEGY = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=569984786&single=true&output=csv"
 
-# 👇 【新增】請在這裡貼上你剛剛發布的 AI_Weekly_Picks 分頁的 CSV 連結
+# 👇 请在这里贴上你发布的 AI_Weekly_Picks 分页的 CSV 链接
 URL_AI_PICKS = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=1100021982&single=true&output=csv" 
 
 # ==========================================
@@ -79,8 +79,8 @@ def convert_google_drive_url(url):
     return url
 
 def safe_read_csv(url):
-    """安全地讀取 CSV 檔案"""
-    if "請在這裡貼上" in url: # 防呆機制，若未填寫網址則回傳空表
+    """安全地读取 CSV 文件"""
+    if "请在这里贴上" in url: # 防呆机制，若未填写网址则回传空表
         return pd.DataFrame()
     try:
         safe_url = quote(url, safe=':/?&=')
@@ -101,7 +101,7 @@ def load_all_data():
 
 @st.cache_data(ttl=60)
 def load_ai_picks():
-    """從 Google Sheet 讀取本週 AI 嚴選清單"""
+    """从 Google Sheet 读取本周 AI 严选清单"""
     df = safe_read_csv(URL_AI_PICKS)
     if not df.empty:
         df.columns = df.columns.str.strip()
@@ -112,7 +112,7 @@ def main():
     st.info("👈 请先点击左上角【 > 】展开菜单，进行肤质鉴定")
     
     df_hero, df_profile, df_strategy = load_all_data()
-    df_ai_picks = load_ai_picks() # 載入 AI 預先算好的清單
+    df_ai_picks = load_ai_picks() # 载入 AI 预先算好的清单
     
     if df_profile.empty:
         st.error("数据加载中，请稍后...")
@@ -245,21 +245,21 @@ def main():
                     
                     if not ai_products.empty:
                         for _, row in ai_products.iterrows():
-                            # 讀取對應的欄位，並去除空值
+                            # 读取对应的字段，并去除空值
                             prod_name = str(row.get("Product_Name", "")).strip()
                             prod_desc = str(row.get("Product_Desc", "")).strip()
                             
-                            # 確保產品名稱不是空的，也不是 nan
+                            # 确保产品名称不是空的，也不是 nan
                             if prod_name and prod_name.lower() != 'nan':
                                 prod_kw = quote(prod_name)
-                                # 注意：這裡依然保留了移除 target="_blank" 的設定 (除了京東)，以利微信跳轉
+                                # 【已修正】：全面换回 Universal Link (https)，加上 target="_blank"，并更新按钮文字
                                 st.markdown(f"""
                                     <div style="margin-bottom: 15px; padding: 12px; border: 1px solid #E2E8F0; border-radius: 8px; background-color: #ffffff; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
                                         <div style="font-weight: bold; font-size: 1.05rem; color: #1E293B;">🛍️ {prod_name}</div>
                                         <div style="font-size: 0.85rem; color: #64748B; margin-bottom: 10px; margin-top: 4px;">{prod_desc}</div>
-                                        <a href="xhsdiscover://search/result?keyword={prod_kw}" class="shop-link xhs-link">📕 搜小红书测评</a>
-                                        <a href="https://so.m.jd.com/ware/search.action?keyword={prod_kw}" target="_blank" class="shop-link jd-link">🔴 京东查底价</a>
-                                        <a href="taobao://s.taobao.com/search?q={prod_kw}" class="shop-link tb-link">🟠 天猫看爆款</a>
+                                        <a href="https://www.xiaohongshu.com/search_result?keyword={prod_kw}" target="_blank" class="shop-link xhs-link">📕 搜小红书测评</a>
+                                        <a href="https://so.m.jd.com/ware/search.action?keyword={prod_kw}" target="_blank" class="shop-link jd-link">🔴 搜京东</a>
+                                        <a href="https://s.taobao.com/search?q={prod_kw}" target="_blank" class="shop-link tb-link">🟠 搜淘宝</a>
                                     </div>
                                 """, unsafe_allow_html=True)
                     else:
