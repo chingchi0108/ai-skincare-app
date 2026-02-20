@@ -13,13 +13,12 @@ URL_TYPE = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoS
 URL_STRATEGY = "https://docs.google.com/spreadsheets/d/e/2PACX-1vRnMztwr71mxuf6pFYoSLlwBeEcxmNrQp0bfA84u3IJPp5DpBmjUwy4ndnL2Zf8mO6hhL1AzHPAXUx3/pub?gid=569984786&single=true&output=csv"
 
 # ==========================================
-# 📱 极简 CSS：仅保留字体自适应与滑动容器，去除所有颜色干预
+# 📱 极简 CSS
 # ==========================================
 st.set_page_config(page_title="AI 全数据护肤系统", layout="wide")
 
 st.markdown("""
     <style>
-    /* 仅根据手机屏幕大小微调标题，完全保留 Streamlit 原生颜色体系 */
     h1 { font-size: clamp(1.2rem, 5vw, 2.2rem) !important; }
     h2 { font-size: clamp(1.1rem, 4vw, 1.8rem) !important; }
     h3 { font-size: clamp(1.0rem, 3.5vw, 1.5rem) !important; }
@@ -27,6 +26,43 @@ st.markdown("""
     h5 { font-size: clamp(0.85rem, 2.8vw, 1.1rem) !important; }
     
     [data-testid="stSidebar"] { width: 300px; }
+    
+    /* 优化电商与小红书按钮链接样式 */
+    .shop-link {
+        display: inline-block;
+        padding: 6px 14px;
+        margin-top: 8px;
+        margin-right: 8px;
+        margin-bottom: 8px;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        text-decoration: none !important;
+        color: white !important;
+        text-align: center;
+    }
+    .xhs-link { background-color: #FF2442; } /* 小红书红 */
+    .jd-link { background-color: #E1251B; } /* 京东红 */
+    .tb-link { background-color: #FF5000; } /* 淘宝橙 */
+    .shop-link:hover { opacity: 0.8; transform: translateY(-1px); }
+    
+    /* 综合推荐卡片底色 */
+    .recommend-box {
+        background-color: #F8FAFC;
+        border-left: 4px solid #3B82F6;
+        padding: 15px;
+        border-radius: 0 8px 8px 0;
+        margin-top: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .sunscreen-type {
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #1E293B;
+        margin-top: 10px;
+        display: block;
+    }
     </style>
     """, unsafe_allow_html=True)
 
@@ -66,10 +102,7 @@ def load_all_data():
     return df_hero, df_type, df_strategy
 
 def main():
-    # 💡 使用独立 CSS 样式单独放大了这个主标题
     st.markdown('<div style="font-size: clamp(1.5rem, 6vw, 2.2rem); font-weight: bold; margin-bottom: 0.8rem;">🧪 AI 全数据护肤系统</div>', unsafe_allow_html=True)
-    
-    # 使用原生的 st.info 来展示提示，干净且兼容所有主题
     st.info("👈 请先点击左上角【 > 】展开菜单，进行肤质鉴定")
     
     df_hero, df_profile, df_strategy = load_all_data()
@@ -125,7 +158,6 @@ def main():
                 st.markdown("#### 👁️ 视觉特写")
                 st.warning(str(user_profile.get(col_visual, '暂无资料')).replace(',', '  \n'))
 
-    # --- 确认按钮 ---
     if st.session_state.step == 1:
         st.markdown("<br>", unsafe_allow_html=True)
         if st.button("✨ 没问题，这就是我！生成方案", use_container_width=True, type="primary"):
@@ -161,7 +193,7 @@ def main():
                 with st.expander("💡 想知道更多.....", expanded=False):
                     st.markdown(str(strat_info.iloc[0, 1]).replace('\n', '  \n'))
 
-            # --- 成分展示回归第一版的 2 列布局，并确保提取 5 个 ---
+            # --- 成分展示区块 ---
             st.markdown("##### ✨ 推荐成分")
             mask = df_hero[col_cat].str.contains(strategy, na=False)
             df_hero[col_score] = pd.to_numeric(df_hero[col_score], errors='coerce').fillna(0)
@@ -177,9 +209,77 @@ def main():
                             st.write(f"推荐指数: {'★' * score}")
                             st.progress(score * 20)
                             st.markdown(f"**功效：**\n{row[col_desc]}")
+                
+                # ==========================================
+                # 🛍️ 综合商品推荐与搜索大区块 (条件分流)
+                # ==========================================
+                st.markdown("<br>", unsafe_allow_html=True)
+                
+                # 判断当前策略是否包含"防晒"
+                if "防晒" in strategy or "防曬" in strategy:
+                    st.markdown(f"""
+                    <div class="recommend-box">
+                        <h5 style="margin-top:0; color:#0F172A;">🛍️ 专属防晒选购指南 (口碑 Top 3-5)</h5>
+                        <p style="font-size:0.9rem; color:#475569; margin-bottom:10px;">
+                            针对您的肤质与【{strategy}】诉求，我们为您提供了三大防晒方向。<br>
+                            👉 <b>点击下方标签，直接检索全网最热卖的防晒单品：</b>
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    # 1. 物理性防晒
+                    phys_kw = quote(f"{strategy} 物理防晒 推荐")
+                    st.markdown(f"""
+                        <span class="sunscreen-type">🛡️ 物理性防晒 (温和不刺激，适合敏弱肌)</span>
+                        <a href="https://www.xiaohongshu.com/search_result?keyword={phys_kw}&source=web_search_result_notes" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
+                        <a href="https://search.jd.com/Search?keyword={phys_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
+                        <a href="https://s.taobao.com/search?q={phys_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
+                    """, unsafe_allow_html=True)
+                    
+                    # 2. 化学性防晒
+                    chem_kw = quote(f"{strategy} 化学防晒 推荐")
+                    st.markdown(f"""
+                        <span class="sunscreen-type">🧪 化学性防晒 (清爽不泛白，适合油皮)</span>
+                        <a href="https://www.xiaohongshu.com/search_result?keyword={chem_kw}&source=web_search_result_notes" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
+                        <a href="https://search.jd.com/Search?keyword={chem_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
+                        <a href="https://s.taobao.com/search?q={chem_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
+                    """, unsafe_allow_html=True)
+                    
+                    # 3. 综合性防晒 (物化结合)
+                    hyb_kw = quote(f"{strategy} 物化结合防晒 推荐")
+                    st.markdown(f"""
+                        <span class="sunscreen-type">✨ 综合性防晒 (物化结合，兼顾肤感与温和)</span>
+                        <a href="https://www.xiaohongshu.com/search_result?keyword={hyb_kw}&source=web_search_result_notes" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
+                        <a href="https://search.jd.com/Search?keyword={hyb_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
+                        <a href="https://s.taobao.com/search?q={hyb_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
+                    """, unsafe_allow_html=True)
+                    
+                else:
+                    # 一般护肤：5 个成分全上
+                    top_ing_names = top_ings[col_name].tolist()
+                    search_ings = " ".join(top_ing_names[:5]) # 组合全部 5 个成分
+                    
+                    st.markdown(f"""
+                    <div class="recommend-box">
+                        <h5 style="margin-top:0; color:#0F172A;">🛍️ 综合护肤产品口碑榜 (口碑 Top 3-5)</h5>
+                        <p style="font-size:0.9rem; color:#475569; margin-bottom:10px;">
+                            结合您的【{strategy}】诉求，以及上述 <b>5 大核心推荐成分</b>，我们为您生成了最强检索通道。<br>
+                            👉 <b>点击下方查看小红书网友票选及各大电商比价：</b>
+                        </p>
+                    </div>
+                    """, unsafe_allow_html=True)
+                    
+                    shop_keyword = quote(f"{strategy} {search_ings} 推荐")
+                    
+                    st.markdown(f"""
+                        <a href="https://www.xiaohongshu.com/search_result?keyword={shop_keyword}&source=web_search_result_notes" target="_blank" class="shop-link xhs-link">📕 搜寻小红书 3-5 强口碑</a>
+                        <a href="https://search.jd.com/Search?keyword={shop_keyword}" target="_blank" class="shop-link jd-link">🔴 去京东查直营价格</a>
+                        <a href="https://s.taobao.com/search?q={shop_keyword}" target="_blank" class="shop-link tb-link">🟠 去天猫搜相关爆款</a>
+                    """, unsafe_allow_html=True)
 
-            # 影音指导保留原生格式，去除颜色干预
+            # 影音指导
             if not strat_info.empty:
+                st.markdown("<br>", unsafe_allow_html=True)
                 video_data = []
                 for i in [5, 6, 7]:
                     if len(strat_info.columns) > i:
