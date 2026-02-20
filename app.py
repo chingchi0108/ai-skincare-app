@@ -235,31 +235,31 @@ def main():
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # 1. 物理性防晒 (移除“推荐”关键字)
+                    # 1. 物理性防晒 (【修正】移除了小红书与天猫的 target="_blank")
                     phys_kw = quote(f"{strategy} 物理防晒")
                     st.markdown(f"""
                         <span class="sunscreen-type">🛡️ 物理性防晒 (温和不刺激，适合敏弱肌)</span>
-                        <a href="xhsdiscover://search/result?keyword={phys_kw}" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
+                        <a href="xhsdiscover://search/result?keyword={phys_kw}" class="shop-link xhs-link">📕 小红书口碑</a>
                         <a href="https://so.m.jd.com/ware/search.action?keyword={phys_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
-                        <a href="taobao://s.taobao.com/search?q={phys_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
+                        <a href="taobao://s.taobao.com/search?q={phys_kw}" class="shop-link tb-link">🟠 天猫爆款</a>
                     """, unsafe_allow_html=True)
                     
-                    # 2. 化学性防晒 (移除“推荐”关键字)
+                    # 2. 化学性防晒 (【修正】移除了小红书与天猫的 target="_blank")
                     chem_kw = quote(f"{strategy} 化学防晒")
                     st.markdown(f"""
                         <span class="sunscreen-type">🧪 化学性防晒 (清爽不泛白，适合油皮)</span>
-                        <a href="xhsdiscover://search/result?keyword={chem_kw}" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
+                        <a href="xhsdiscover://search/result?keyword={chem_kw}" class="shop-link xhs-link">📕 小红书口碑</a>
                         <a href="https://so.m.jd.com/ware/search.action?keyword={chem_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
-                        <a href="taobao://s.taobao.com/search?q={chem_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
+                        <a href="taobao://s.taobao.com/search?q={chem_kw}" class="shop-link tb-link">🟠 天猫爆款</a>
                     """, unsafe_allow_html=True)
                     
-                    # 3. 综合性防晒 (移除“推荐”关键字)
+                    # 3. 综合性防晒 (【修正】移除了小红书与天猫的 target="_blank")
                     hyb_kw = quote(f"{strategy} 物化结合防晒")
                     st.markdown(f"""
                         <span class="sunscreen-type">✨ 综合性防晒 (物化结合，兼顾肤感与温和)</span>
-                        <a href="xhsdiscover://search/result?keyword={hyb_kw}" target="_blank" class="shop-link xhs-link">📕 小红书口碑</a>
+                        <a href="xhsdiscover://search/result?keyword={hyb_kw}" class="shop-link xhs-link">📕 小红书口碑</a>
                         <a href="https://so.m.jd.com/ware/search.action?keyword={hyb_kw}" target="_blank" class="shop-link jd-link">🔴 京东直营</a>
-                        <a href="taobao://s.taobao.com/search?q={hyb_kw}" target="_blank" class="shop-link tb-link">🟠 天猫爆款</a>
+                        <a href="taobao://s.taobao.com/search?q={hyb_kw}" class="shop-link tb-link">🟠 天猫爆款</a>
                     """, unsafe_allow_html=True)
                     
                 else:
@@ -277,13 +277,13 @@ def main():
                     </div>
                     """, unsafe_allow_html=True)
                     
-                    # (移除“推荐”关键字)
                     shop_keyword = quote(f"{strategy} {search_ings}")
                     
+                    # (【修正】移除了小红书与天猫的 target="_blank")
                     st.markdown(f"""
-                        <a href="xhsdiscover://search/result?keyword={shop_keyword}" target="_blank" class="shop-link xhs-link">📕 搜寻小红书 3-5 强口碑</a>
+                        <a href="xhsdiscover://search/result?keyword={shop_keyword}" class="shop-link xhs-link">📕 搜寻小红书 3-5 强口碑</a>
                         <a href="https://so.m.jd.com/ware/search.action?keyword={shop_keyword}" target="_blank" class="shop-link jd-link">🔴 去京东查直营价格</a>
-                        <a href="taobao://s.taobao.com/search?q={shop_keyword}" target="_blank" class="shop-link tb-link">🟠 去天猫搜相关爆款</a>
+                        <a href="taobao://s.taobao.com/search?q={shop_keyword}" class="shop-link tb-link">🟠 去天猫搜相关爆款</a>
                     """, unsafe_allow_html=True)
 
             # 影音指导
